@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone, MessageCircle, X } from "lucide-react";
+import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
 import hero from "@/assets/hero.jpg";
@@ -7,6 +7,8 @@ import kitten from "@/assets/kitten.jpg";
 import smallPets from "@/assets/small-pets.jpg";
 import logo from "@/assets/pal-logo.png";
 import { PetChat } from "@/components/PetChat";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,6 +33,7 @@ const services = [
 
 function Index() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [hasProducts, setHasProducts] = useState(false);
 
   return (
     <div className="min-h-screen">
@@ -99,18 +102,18 @@ function Index() {
       </main>
 
       {chatOpen && (
-        <div className="fixed bottom-24 right-4 z-50 flex h-[min(600px,calc(100dvh-8rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl md:right-6">
-          <PetChat onClose={() => setChatOpen(false)} />
+        <div role="dialog" aria-label="Chat with Pal" className={cn("fixed bottom-4 right-4 z-50 flex h-[min(680px,calc(100dvh-2rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl md:bottom-6 md:right-6 motion-safe:transition-[width] motion-safe:duration-300", hasProducts ? "w-[min(580px,calc(100vw-2rem))]" : "w-[min(400px,calc(100vw-2rem))]")}>
+          <PetChat onClose={() => { setChatOpen(false); setHasProducts(false); }} onProductsChange={setHasProducts} />
         </div>
       )}
 
-      <button
-        onClick={() => setChatOpen((o) => !o)}
-        aria-label={chatOpen ? "Close chat" : "Chat with Pal"}
+      {!chatOpen && <Button
+        onClick={() => setChatOpen(true)}
+        aria-label="Chat with Pal"
         className="fixed bottom-6 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:right-6"
       >
-        {chatOpen ? <X className="size-6" /> : <MessageCircle className="size-6" />}
-      </button>
+        <MessageCircle className="size-6" />
+      </Button>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, isToolUIPart, type DynamicToolUIPart, type ToolUIPart } from "ai";
-import { useState } from "react";
+import { DefaultChatTransport, isToolUIPart } from "ai";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
@@ -8,7 +8,9 @@ import { Conversation, ConversationContent, ConversationEmptyState, Conversation
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import { PromptInput, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
+import { Button } from "@/components/ui/button";
+import { ProductRecommendations } from "@/components/ProductRecommendations";
+import { normalizeRecommendations } from "@/lib/product-recommendations";
 import logo from "@/assets/pal-logo.png";
 
 const SUGGESTIONS = [
@@ -16,30 +18,32 @@ const SUGGESTIONS = [
   "What flea protection is safe for a puppy?",
 ];
 
-const toolTitles: Record<string, string> = {
-  search_products: "Searching Zoomag shop",
-  get_product: "Checking product details",
-  find_business: "Finding pet shops",
-  get_categories: "Browsing categories",
-};
-
-export function PetChat({ onClose }: { onClose?: () => void }) {
+export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; onProductsChange?: (hasProducts: boolean) => void }) {
   const [input, setInput] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
     onError: (e) => {
-      const m = e.message || "";
-      if (m.includes("429")) toast.error("Too many requests — please wait a moment.");
-      else if (m.includes("402")) toast.error("AI credits are exhausted.");
-      else toast.error("Something went wrong. Please try again.");
+      toast.error(e.message || "Pal couldn't finish this reply. Please try again.");
     },
   });
   const busy = status === "submitted" || status === "streaming";
+  const hasProducts = messages.some((message) => message.parts.some((part) => {
+    if (!isToolUIPart(part) || part.state !== "output-available") return false;
+    const name = part.type === "dynamic-tool" ? part.toolName : part.type.slice(5);
+    return name === "show_products" && normalizeRecommendations(part.output).length > 0;
+  }));
+
+  useEffect(() => { onProductsChange?.(hasProducts); }, [hasProducts, onProductsChange]);
+  useEffect(() => {
+    if (!busy) textareaRef.current?.focus();
+  }, [busy]);
 
   const send = (text: string) => {
     if (!text.trim() || busy) return;
     sendMessage({ text });
     setInput("");
+    textareaRef.current?.focus();
   };
 
   return (
@@ -48,12 +52,12 @@ export function PetChat({ onClose }: { onClose?: () => void }) {
         <img src={logo} alt="Pal" width={40} height={40} className="size-10" />
         <div className="flex-1">
           <p className="font-display text-lg leading-tight">Ask Pal</p>
-          <p className="text-xs text-muted-foreground">Pet care advice & products from Zoomag</p>
+          <p className="text-xs text-muted-foreground">Pet care & finds from pet shops</p>
         </div>
         {onClose && (
-          <button onClick={onClose} aria-label="Close chat" className="rounded-full p-1.5 text-muted-foreground hover:bg-accent">
+          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close chat" className="shrink-0 text-muted-foreground">
             <X className="size-4" />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -66,39 +70,29 @@ export function PetChat({ onClose }: { onClose?: () => void }) {
                 <p className="font-display text-xl">Hi, I'm Pal!</p>
                 <p className="text-sm text-muted-foreground">Tell me about your pet — I'll share care tips and find products.</p>
                 {SUGGESTIONS.map((s) => (
-                  <button
+                  <Button
                     key={s}
+                     variant="outline"
                     onClick={() => send(s)}
-                    className="rounded-xl border bg-background p-3 text-left text-sm transition-colors hover:bg-accent"
+                     className="h-auto whitespace-normal rounded-lg p-3 text-left text-sm"
                   >
                     {s}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </ConversationEmptyState>
           ) : (
             messages.map((m) => (
-              <Message key={m.id} from={m.role}>
-                <MessageContent>
+              <Message key={m.id} from={m.role} className={m.role === "assistant" ? "max-w-full" : undefined}>
+                <MessageContent className={m.role === "assistant" ? "w-full" : undefined}>
                   {m.parts.map((p, i) => {
                     if (p.type === "text")
-                      return <MessageResponse key={i}>{p.text}</MessageResponse>;
+                      return <MessageResponse key={i} linkSafety={{ enabled: false }} isAnimating={status === "streaming" && m.id === messages.at(-1)?.id}>{p.text}</MessageResponse>;
                     if (isToolUIPart(p)) {
-                      const tp = p as ToolUIPart | DynamicToolUIPart;
-                      const name = tp.type === "dynamic-tool" ? tp.toolName : tp.type.slice(5);
-                      return (
-                        <Tool key={i} defaultOpen={false}>
-                          {tp.type === "dynamic-tool" ? (
-                            <ToolHeader type="dynamic-tool" toolName={tp.toolName} state={tp.state} title={toolTitles[name] ?? name} />
-                          ) : (
-                            <ToolHeader type={tp.type} state={tp.state} title={toolTitles[name] ?? name} />
-                          )}
-                          <ToolContent>
-                            <ToolInput input={tp.input} />
-                            <ToolOutput output={tp.state === "output-available" ? tp.output : undefined} errorText={tp.state === "output-error" ? tp.errorText : undefined} />
-                          </ToolContent>
-                        </Tool>
-                      );
+                      const name = p.type === "dynamic-tool" ? p.toolName : p.type.slice(5);
+                      if (name !== "show_products" || p.state !== "output-available") return null;
+                      const products = normalizeRecommendations(p.output);
+                      return products.length ? <ProductRecommendations key={i} products={products} /> : null;
                     }
                     return null;
                   })}
@@ -106,7 +100,7 @@ export function PetChat({ onClose }: { onClose?: () => void }) {
               </Message>
             ))
           )}
-          {status === "submitted" && <Shimmer>Pal is thinking...</Shimmer>}
+          {busy && <Shimmer>Pal is thinking...</Shimmer>}
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
@@ -114,6 +108,9 @@ export function PetChat({ onClose }: { onClose?: () => void }) {
       <div className="border-t p-3">
         <PromptInput onSubmit={(msg) => send(msg.text ?? "")}>
           <PromptInputTextarea
+            ref={textareaRef}
+            autoFocus
+            className="min-h-12"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your pet..."
