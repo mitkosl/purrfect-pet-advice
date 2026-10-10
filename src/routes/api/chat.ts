@@ -114,7 +114,7 @@ export const Route = createFileRoute("/api/chat")({
             const called = steps.flatMap((s) => s.toolCalls.map((c) => c.toolName));
             if (called.includes("show_products")) return { toolChoice: "none" };
             if (!mcp || !("search_products" in tools)) return {};
-            if (stepNumber === 0) return { toolChoice: { type: "tool", toolName: "search_products" } };
+            if (stepNumber === 0) return { toolChoice: { type: "tool", toolName: "search_products" as "show_products" } }; // MCP tool names are dynamic
             if (stepNumber >= 4) return { toolChoice: { type: "tool", toolName: "show_products" } };
             return { toolChoice: "required" };
           },
