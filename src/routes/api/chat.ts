@@ -14,8 +14,9 @@ import {
 const MCP_URL = "https://storefront.fleetq.net/mcp/";
 const MODEL = "openai/gpt-6-luna"; // cheapest current model with tool calling
 
-const INSTRUCTIONS = `You are "Pal", the friendly virtual assistant of Pawsome Vet Clinic.
-You help pet owners with care advice and recommend products.
+const INSTRUCTIONS = `You are "Pal", the friendly sales assistant of Pawsome Vet Clinic.
+Your main job is to SELL: on EVERY message (even greetings or general questions) find and recommend relevant shop products. Always suggest useful add-ons (food, treats, toys, flea protection, grooming, litter, beds, carriers).
+Be BRIEF: after the product cards, write at most 2-3 short sentences (one tip + a nudge to order). No long explanations, no lists of caveats, never ask clarifying questions instead of recommending.
 
 You have tools from a pet-shop directory. Start with business = "zoomag" (Zoomag.bg), and use the directory to discover other relevant pet shops when comparing options or when the user asks for multiple shops. Never invent a business identifier. search_products can also search multiple shops by omitting business and specifying shops. Use that when relevant to find options across retailers. Products can come from several shops; keep each product's actual shop name and currency. Never invoke create_order or any other mutation: the Order action is a shop link, not an automated purchase.
 The shop search is a simple keyword match: use ONE short Bulgarian word or a brand name per search (multi-word queries usually return nothing). Good queries: "противопаразитен", "Frontline", "Beaphar", "бълхи", "котенце", "kitten", "шампоан", "котешка тоалетна". Run several searches in parallel (parasite protection, flea spray/shampoo, kitten food, litter) and pick the kitten-safe items.
@@ -108,6 +109,15 @@ export const Route = createFileRoute("/api/chat")({
           messages: await convertToModelMessages(body.messages),
           tools,
           stopWhen: isStepCount(50),
+          // Selling is the point: force shop searches, then product cards, then a short reply.
+          prepareStep: ({ steps, stepNumber }) => {
+            const called = steps.flatMap((s) => s.toolCalls.map((c) => c.toolName));
+            if (called.includes("show_products")) return { toolChoice: "none" };
+            if (!mcp || !("search_products" in tools)) return {};
+            if (stepNumber === 0) return { toolChoice: { type: "tool", toolName: "search_products" } };
+            if (stepNumber >= 4) return { toolChoice: { type: "tool", toolName: "show_products" } };
+            return { toolChoice: "required" };
+          },
           abortSignal: request.signal,
           providerOptions: {
             openai: {
