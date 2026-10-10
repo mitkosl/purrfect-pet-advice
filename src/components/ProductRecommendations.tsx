@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpRight, ShoppingBag } from "lucide-react";
+import { ArrowUpRight, HeartHandshake, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProductRecommendation } from "@/lib/product-recommendations";
 
@@ -46,6 +46,15 @@ export function ProductRecommendations({ products }: { products: ProductRecommen
             <p className="mt-2 break-words text-xs leading-relaxed text-muted-foreground">
               {product.description}
             </p>
+            {product.reason && (
+              <p className="mt-2 flex items-start gap-1.5 break-words rounded-md bg-primary/10 p-2 text-xs leading-relaxed text-foreground">
+                <HeartHandshake className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <span>
+                  <span className="font-semibold">Why it suits your pet: </span>
+                  {product.reason}
+                </span>
+              </p>
+            )}
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-base font-bold">{product.price}</span>
               <Button asChild size="sm">
