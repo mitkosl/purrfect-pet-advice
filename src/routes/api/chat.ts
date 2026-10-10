@@ -24,7 +24,7 @@ MANDATORY: For ANY question about pet care, health, food, parasites, grooming, t
 
 When answering:
 - Keep advice short (a few bullet points); the product cards are the main value. Give practical care advice (feeding, vaccines schedule, deworming, flea protection, litter, vet visit).
-- Then call show_products with 3-6 concrete products found via the tools. NEVER use markdown tables or repeat the product list in text. The tool displays readable product cards. Each card needs its actual name, shop, price with currency, short useful description and age/weight suitability, and sourceUrl from source_url. Read images from attributes.image_url in search_products or get_product results. Include imageUrl only when an actual product image URL is provided by the shop tools; otherwise null. Include orderUrl only when a product-specific cart/add-to-cart/order URL is explicitly returned by the shop tools; otherwise null. NEVER guess cart URLs, use a generic empty cart, or claim an item was added to a cart. When no order URL is available, the Order button opens the actual product page where the user can select options and add it to their cart. Do not fabricate images or URLs.
+- Then call show_products with 3-6 concrete products found via the tools. NEVER use markdown tables or repeat the product list in text. The tool displays readable product cards. Each card needs its actual name, shop, price with currency, a short description, a "reason" explaining why it suits this specific pet (age, weight, species, problem — e.g. "Safe for kittens from 2 days old, so it fits your 2-month-old kitten"), and sourceUrl from source_url. Read images from attributes.image_url in search_products or get_product results. Include imageUrl only when an actual product image URL is provided by the shop tools; otherwise null. Include orderUrl only when a product-specific cart/add-to-cart/order URL is explicitly returned by the shop tools; otherwise null. NEVER guess cart URLs, use a generic empty cart, or claim an item was added to a cart. When no order URL is available, the Order button opens the actual product page where the user can select options and add it to their cart. Do not fabricate images or URLs.
 - For kittens/puppies ALWAYS include at least one flea/parasite product (e.g. Frontline spray or Beaphar Dimethicare spray, which are labelled usable for young kittens) and a deworming product if found. Don't withhold them — recommend them with a short age/weight note instead.
 - Never invent products; only list ones the tools returned.
 - Remind them that medicines should be confirmed with a vet and offer a visit at the clinic.
@@ -68,7 +68,12 @@ export const Route = createFileRoute("/api/chat")({
                   description: z
                     .string()
                     .describe(
-                      "Short product information and age/weight suitability in the user's language.",
+                      "Short product information (what it is, size/form) in the user's language.",
+                    ),
+                  reason: z
+                    .string()
+                    .describe(
+                      "One or two sentences explaining why this product suits THIS user's pet (age, weight, species, problem), in the user's language.",
                     ),
                   sourceUrl: z.string().describe("Exact product source_url from the shop result."),
                   imageUrl: z
