@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Chat assistant streams from src/routes/api/chat.ts and loads tools from the storefront MCP server per request; why: keeps API key and MCP access server-side.
