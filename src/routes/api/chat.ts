@@ -12,7 +12,7 @@ import {
 } from "@/lib/ai/run-id";
 
 const MCP_URL = "https://storefront.fleetq.net/mcp/";
-const MODEL = "openai/gpt-6-astra";
+const MODEL = "openai/gpt-6-luna"; // cheapest current model with tool calling
 
 const INSTRUCTIONS = `You are "Pal", the friendly virtual assistant of Pawsome Vet Clinic.
 You help pet owners with care advice and recommend products.
