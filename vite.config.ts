@@ -11,7 +11,7 @@ export default defineConfig({
     resolve: {
       // pkce-challenge has no "workerd"/"worker" export; its browser build uses Web Crypto and runs on Workers.
       alias: {
-        "pkce-challenge": "/dev-server/node_modules/pkce-challenge/dist/index.browser.js",
+        "pkce-challenge": new URL("./node_modules/pkce-challenge/dist/index.browser.js", import.meta.url).pathname,
       },
     },
   },
