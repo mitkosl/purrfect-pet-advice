@@ -3,8 +3,22 @@ import type { UIMessage } from "ai";
 import { isChatDebugEnabled, orderedChatParts } from "@/lib/chat-presentation";
 
 const parts: UIMessage["parts"] = [
-  { type: "dynamic-tool", toolName: "search_products", toolCallId: "search", state: "output-available", input: {}, output: {} },
-  { type: "dynamic-tool", toolName: "show_products", toolCallId: "products", state: "output-available", input: {}, output: { products: [] } },
+  {
+    type: "dynamic-tool",
+    toolName: "search_products",
+    toolCallId: "search",
+    state: "output-available",
+    input: {},
+    output: {},
+  },
+  {
+    type: "dynamic-tool",
+    toolName: "show_products",
+    toolCallId: "products",
+    state: "output-available",
+    input: {},
+    output: { products: [] },
+  },
   { type: "text", text: "Kitten care advice." },
 ];
 

@@ -18,7 +18,13 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
-import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
+import {
+  Tool,
+  ToolContent,
+  ToolHeader,
+  ToolInput,
+  ToolOutput,
+} from "@/components/ai-elements/tool";
 import { Button } from "@/components/ui/button";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { normalizeRecommendations } from "@/lib/product-recommendations";
@@ -121,46 +127,50 @@ export function PetChat({
                 className={m.role === "assistant" ? "max-w-full" : undefined}
               >
                 <MessageContent className={m.role === "assistant" ? "w-full" : undefined}>
-                  {orderedChatParts(m.parts, debug, busy && m.id === messages.at(-1)?.id).map((p, i) => {
-                    if (p.type === "text")
-                      return (
-                        <MessageResponse
-                          key={i}
-                          linkSafety={{ enabled: false }}
-                          isAnimating={status === "streaming" && m.id === messages.at(-1)?.id}
-                        >
-                          {p.text}
-                        </MessageResponse>
-                      );
-                    if (isToolUIPart(p)) {
-                      const name = p.type === "dynamic-tool" ? p.toolName : p.type.slice(5);
-                      if (name === "show_products") {
-                        if (p.state !== "output-available") return null;
-                        const products = normalizeRecommendations(p.output);
-                        return products.length ? (
-                          <div key={i} className="flex w-full flex-col gap-3">
-                            <p className="text-sm font-semibold">We recommend these for your pet:</p>
-                            <ProductRecommendations products={products} />
-                          </div>
-                        ) : null;
+                  {orderedChatParts(m.parts, debug, busy && m.id === messages.at(-1)?.id).map(
+                    (p, i) => {
+                      if (p.type === "text")
+                        return (
+                          <MessageResponse
+                            key={i}
+                            linkSafety={{ enabled: false }}
+                            isAnimating={status === "streaming" && m.id === messages.at(-1)?.id}
+                          >
+                            {p.text}
+                          </MessageResponse>
+                        );
+                      if (isToolUIPart(p)) {
+                        const name = p.type === "dynamic-tool" ? p.toolName : p.type.slice(5);
+                        if (name === "show_products") {
+                          if (p.state !== "output-available") return null;
+                          const products = normalizeRecommendations(p.output);
+                          return products.length ? (
+                            <div key={i} className="flex w-full flex-col gap-3">
+                              <p className="text-sm font-semibold">
+                                We recommend these for your pet:
+                              </p>
+                              <ProductRecommendations products={products} />
+                            </div>
+                          ) : null;
+                        }
+                        // Search details are available only in URL-enabled debug mode.
+                        return (
+                          <Tool key={i} defaultOpen={false}>
+                            {p.type === "dynamic-tool" ? (
+                              <ToolHeader type={p.type} toolName={p.toolName} state={p.state} />
+                            ) : (
+                              <ToolHeader type={p.type} state={p.state} />
+                            )}
+                            <ToolContent>
+                              <ToolInput input={p.input} />
+                              <ToolOutput output={p.output} errorText={p.errorText} />
+                            </ToolContent>
+                          </Tool>
+                        );
                       }
-                      // Search details are available only in URL-enabled debug mode.
-                      return (
-                        <Tool key={i} defaultOpen={false}>
-                          {p.type === "dynamic-tool" ? (
-                            <ToolHeader type={p.type} toolName={p.toolName} state={p.state} />
-                          ) : (
-                            <ToolHeader type={p.type} state={p.state} />
-                          )}
-                          <ToolContent>
-                            <ToolInput input={p.input} />
-                            <ToolOutput output={p.output} errorText={p.errorText} />
-                          </ToolContent>
-                        </Tool>
-                      );
-                    }
-                    return null;
-                  })}
+                      return null;
+                    },
+                  )}
                 </MessageContent>
               </Message>
             ))
