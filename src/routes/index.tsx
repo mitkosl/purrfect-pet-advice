@@ -1,24 +1,103 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone } from "lucide-react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import hero from "@/assets/hero.jpg";
+import kitten from "@/assets/kitten.jpg";
+import smallPets from "@/assets/small-pets.jpg";
+import logo from "@/assets/pal-logo.png";
+import { PetChat } from "@/components/PetChat";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Pawsome Vet Clinic — Care for every paw" },
+      { name: "description", content: "Friendly veterinary clinic for cats, dogs and small pets, with an AI assistant for care advice." },
+      { property: "og:title", content: "Pawsome Vet Clinic" },
+      { property: "og:description", content: "Friendly vet care plus an AI assistant that recommends pet products." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+const services = [
+  { icon: Stethoscope, title: "Check-ups", text: "Gentle wellness exams for every age." },
+  { icon: Syringe, title: "Vaccines", text: "Kitten & puppy vaccination plans." },
+  { icon: Scissors, title: "Grooming", text: "Baths, trims and nail care." },
+  { icon: HeartPulse, title: "Surgery", text: "Modern, safe and caring." },
+];
+
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen flex-col lg:flex-row">
+      <main className="flex-1 lg:h-screen lg:overflow-y-auto">
+        <header className="flex items-center justify-between px-6 py-5 md:px-12">
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="" width={36} height={36} className="size-9" />
+            <span className="font-display text-xl">Pawsome Vet</span>
+          </div>
+          <nav className="hidden gap-8 text-sm text-muted-foreground md:flex">
+            <a href="#services">Services</a>
+            <a href="#team">Pets we love</a>
+            <a href="#visit">Visit</a>
+          </nav>
+        </header>
+
+        <section className="px-6 pb-16 md:px-12">
+          <div className="relative overflow-hidden rounded-3xl">
+            <img src={hero} alt="Puppy and kitten at the clinic" width={1536} height={1024} className="h-[480px] w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 max-w-lg p-8 md:p-12">
+              <p className="mb-3 text-sm uppercase tracking-widest text-background/80">Veterinary clinic</p>
+              <h1 className="font-display text-5xl leading-[1.05] text-background md:text-6xl">Care for every paw, whisker & wing.</h1>
+              <a href="#visit" className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">Book a visit</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="services" className="px-6 pb-20 md:px-12">
+          <h2 className="font-display text-4xl">What we do</h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {services.map((s) => (
+              <div key={s.title} className="rounded-2xl bg-secondary p-6">
+                <s.icon className="size-6 text-primary" />
+                <p className="mt-4 font-medium">{s.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="team" className="grid gap-6 px-6 pb-20 md:grid-cols-2 md:px-12">
+          <figure className="overflow-hidden rounded-3xl bg-secondary">
+            <img src={kitten} alt="Kitten held by a vet" loading="lazy" width={1024} height={1024} className="aspect-square w-full object-cover" />
+            <figcaption className="p-6">
+              <p className="font-display text-2xl">New kitten?</p>
+              <p className="text-sm text-muted-foreground">Ask Pal in the chat for a first-weeks care plan.</p>
+            </figcaption>
+          </figure>
+          <figure className="overflow-hidden rounded-3xl bg-secondary">
+            <img src={smallPets} alt="Rabbit and parrot" loading="lazy" width={1024} height={1024} className="aspect-square w-full object-cover" />
+            <figcaption className="p-6">
+              <p className="font-display text-2xl">Small & exotic pets</p>
+              <p className="text-sm text-muted-foreground">Rabbits, birds, and more — all welcome.</p>
+            </figcaption>
+          </figure>
+        </section>
+
+        <footer id="visit" className="border-t px-6 py-10 text-sm text-muted-foreground md:px-12">
+          <div className="flex flex-wrap gap-8">
+            <span className="flex items-center gap-2"><MapPin className="size-4" /> 12 Example Street, Sofia</span>
+            <span className="flex items-center gap-2"><Phone className="size-4" /> +359 000 000 000</span>
+            <span>Mon–Sat, 9:00–19:00</span>
+          </div>
+        </footer>
+      </main>
+
+      <aside className="h-[80vh] border-t lg:sticky lg:top-0 lg:h-screen lg:w-[420px] lg:border-l lg:border-t-0">
+        <PetChat />
+      </aside>
     </div>
   );
 }
