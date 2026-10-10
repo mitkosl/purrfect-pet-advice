@@ -3,6 +3,7 @@ export interface ProductRecommendation {
   shop: string;
   price: string;
   description: string;
+  reason: string;
   sourceUrl: string;
   imageUrl: string | null;
   orderUrl: string | null;
@@ -46,6 +47,7 @@ export function normalizeRecommendations(value: unknown): ProductRecommendation[
           shop: p["shop"],
           price: p["price"],
           description: p["description"],
+          reason: typeof p["reason"] === "string" ? p["reason"] : "",
           sourceUrl,
           imageUrl: typeof p["imageUrl"] === "string" ? safeShopUrl(p["imageUrl"]) : null,
           orderUrl: typeof p["orderUrl"] === "string" ? safeShopUrl(p["orderUrl"]) : null,
