@@ -18,6 +18,7 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { Button } from "@/components/ui/button";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { normalizeRecommendations } from "@/lib/product-recommendations";
@@ -130,11 +131,27 @@ export function PetChat({
                       );
                     if (isToolUIPart(p)) {
                       const name = p.type === "dynamic-tool" ? p.toolName : p.type.slice(5);
-                      if (name !== "show_products" || p.state !== "output-available") return null;
-                      const products = normalizeRecommendations(p.output);
-                      return products.length ? (
-                        <ProductRecommendations key={i} products={products} />
-                      ) : null;
+                      if (name === "show_products") {
+                        if (p.state !== "output-available") return null;
+                        const products = normalizeRecommendations(p.output);
+                        return products.length ? (
+                          <ProductRecommendations key={i} products={products} />
+                        ) : null;
+                      }
+                      // Debug: show shop searches and their raw results.
+                      return (
+                        <Tool key={i} defaultOpen={false}>
+                          {p.type === "dynamic-tool" ? (
+                            <ToolHeader type={p.type} toolName={p.toolName} state={p.state} />
+                          ) : (
+                            <ToolHeader type={p.type} state={p.state} />
+                          )}
+                          <ToolContent>
+                            <ToolInput input={p.input} />
+                            <ToolOutput output={p.output} errorText={p.errorText} />
+                          </ToolContent>
+                        </Tool>
+                      );
                     }
                     return null;
                   })}
