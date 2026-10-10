@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/chat")({
         } catch (e) {
           console.error("MCP connect failed", e);
         }
-        const mcpTools = mcp ? await mcp.tools().catch(() => ({})) : {};
+        const mcpTools = mcp ? await mcp.tools().catch((e) => { console.error("MCP tools failed", e); return {}; }) : {};
         const tools = {
           ...mcpTools,
           show_products: tool({
