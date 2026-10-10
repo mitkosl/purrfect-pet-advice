@@ -1,5 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone, MessageCircle } from "lucide-react";
+import {
+  Stethoscope,
+  Syringe,
+  Scissors,
+  HeartPulse,
+  MapPin,
+  Phone,
+  MessageCircle,
+} from "lucide-react";
 import { useState } from "react";
 
 import hero from "@/assets/hero.jpg";
@@ -14,9 +22,16 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Pawsome Vet Clinic — Care for every paw" },
-      { name: "description", content: "Friendly veterinary clinic for cats, dogs and small pets, with an AI assistant for care advice." },
+      {
+        name: "description",
+        content:
+          "Friendly veterinary clinic for cats, dogs and small pets, with an AI assistant for care advice.",
+      },
       { property: "og:title", content: "Pawsome Vet Clinic" },
-      { property: "og:description", content: "Friendly vet care plus an AI assistant that recommends pet products." },
+      {
+        property: "og:description",
+        content: "Friendly vet care plus an AI assistant that recommends pet products.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -52,12 +67,27 @@ function Index() {
 
         <section className="px-6 pb-16 md:px-12">
           <div className="relative overflow-hidden rounded-3xl">
-            <img src={hero} alt="Puppy and kitten at the clinic" width={1536} height={1024} className="h-[480px] w-full object-cover" />
+            <img
+              src={hero}
+              alt="Puppy and kitten at the clinic"
+              width={1536}
+              height={1024}
+              className="h-[480px] w-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/20 to-transparent" />
             <div className="absolute bottom-0 left-0 max-w-lg p-8 md:p-12">
-              <p className="mb-3 text-sm uppercase tracking-widest text-background/80">Veterinary clinic</p>
-              <h1 className="font-display text-5xl leading-[1.05] text-background md:text-6xl">Care for every paw, whisker & wing.</h1>
-              <a href="#visit" className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">Book a visit</a>
+              <p className="mb-3 text-sm uppercase tracking-widest text-background/80">
+                Veterinary clinic
+              </p>
+              <h1 className="font-display text-5xl leading-[1.05] text-background md:text-6xl">
+                Care for every paw, whisker & wing.
+              </h1>
+              <a
+                href="#visit"
+                className="mt-6 inline-block rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground"
+              >
+                Book a visit
+              </a>
             </div>
           </div>
         </section>
@@ -77,43 +107,80 @@ function Index() {
 
         <section id="team" className="grid gap-6 px-6 pb-20 md:grid-cols-2 md:px-12">
           <figure className="overflow-hidden rounded-3xl bg-secondary">
-            <img src={kitten} alt="Kitten held by a vet" loading="lazy" width={1024} height={1024} className="aspect-square w-full object-cover" />
+            <img
+              src={kitten}
+              alt="Kitten held by a vet"
+              loading="lazy"
+              width={1024}
+              height={1024}
+              className="aspect-square w-full object-cover"
+            />
             <figcaption className="p-6">
               <p className="font-display text-2xl">New kitten?</p>
-              <p className="text-sm text-muted-foreground">Ask Pal in the chat for a first-weeks care plan.</p>
+              <p className="text-sm text-muted-foreground">
+                Ask Pal in the chat for a first-weeks care plan.
+              </p>
             </figcaption>
           </figure>
           <figure className="overflow-hidden rounded-3xl bg-secondary">
-            <img src={smallPets} alt="Rabbit and parrot" loading="lazy" width={1024} height={1024} className="aspect-square w-full object-cover" />
+            <img
+              src={smallPets}
+              alt="Rabbit and parrot"
+              loading="lazy"
+              width={1024}
+              height={1024}
+              className="aspect-square w-full object-cover"
+            />
             <figcaption className="p-6">
               <p className="font-display text-2xl">Small & exotic pets</p>
-              <p className="text-sm text-muted-foreground">Rabbits, birds, and more — all welcome.</p>
+              <p className="text-sm text-muted-foreground">
+                Rabbits, birds, and more — all welcome.
+              </p>
             </figcaption>
           </figure>
         </section>
 
         <footer id="visit" className="border-t px-6 py-10 text-sm text-muted-foreground md:px-12">
           <div className="flex flex-wrap gap-8">
-            <span className="flex items-center gap-2"><MapPin className="size-4" /> 12 Example Street, Sofia</span>
-            <span className="flex items-center gap-2"><Phone className="size-4" /> +359 000 000 000</span>
+            <span className="flex items-center gap-2">
+              <MapPin className="size-4" /> 12 Example Street, Sofia
+            </span>
+            <span className="flex items-center gap-2">
+              <Phone className="size-4" /> +359 000 000 000
+            </span>
             <span>Mon–Sat, 9:00–19:00</span>
           </div>
         </footer>
       </main>
 
       {chatOpen && (
-        <div role="dialog" aria-label="Chat with Pal" className={cn("fixed bottom-4 right-4 z-50 flex h-[min(680px,calc(100dvh-2rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl md:bottom-6 md:right-6 motion-safe:transition-[width] motion-safe:duration-300", hasProducts ? "w-[min(580px,calc(100vw-2rem))]" : "w-[min(400px,calc(100vw-2rem))]")}>
-          <PetChat onClose={() => { setChatOpen(false); setHasProducts(false); }} onProductsChange={setHasProducts} />
+        <div
+          role="dialog"
+          aria-label="Chat with Pal"
+          className={cn(
+            "fixed bottom-4 right-4 z-50 flex h-[min(680px,calc(100dvh-2rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl md:bottom-6 md:right-6 motion-safe:transition-[width] motion-safe:duration-300",
+            hasProducts ? "w-[min(580px,calc(100vw-2rem))]" : "w-[min(400px,calc(100vw-2rem))]",
+          )}
+        >
+          <PetChat
+            onClose={() => {
+              setChatOpen(false);
+              setHasProducts(false);
+            }}
+            onProductsChange={setHasProducts}
+          />
         </div>
       )}
 
-      {!chatOpen && <Button
-        onClick={() => setChatOpen(true)}
-        aria-label="Chat with Pal"
-        className="fixed bottom-6 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:right-6"
-      >
-        <MessageCircle className="size-6" />
-      </Button>}
+      {!chatOpen && (
+        <Button
+          onClick={() => setChatOpen(true)}
+          aria-label="Chat with Pal"
+          className="fixed bottom-6 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:right-6"
+        >
+          <MessageCircle className="size-6" />
+        </Button>
+      )}
     </div>
   );
 }

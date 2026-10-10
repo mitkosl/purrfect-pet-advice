@@ -8,8 +8,16 @@ function ProductImage({ product }: { product: ProductRecommendation }) {
   return (
     <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-background">
       {product.imageUrl && !failed ? (
-        <img src={product.imageUrl} alt={product.name} loading="lazy" className="size-full object-contain p-1" onError={() => setFailed(true)} />
-      ) : <ShoppingBag className="size-7 text-muted-foreground" />}
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          loading="lazy"
+          className="size-full object-contain p-1"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <ShoppingBag className="size-7 text-muted-foreground" />
+      )}
     </div>
   );
 }
@@ -18,16 +26,39 @@ export function ProductRecommendations({ products }: { products: ProductRecommen
   return (
     <div className="not-prose grid w-full min-w-0 gap-3">
       {products.map((product) => (
-        <article key={`${product.shop}-${product.sourceUrl}`} className="flex min-w-0 gap-3 rounded-lg border bg-background p-4">
+        <article
+          key={`${product.shop}-${product.sourceUrl}`}
+          className="flex min-w-0 gap-3 rounded-lg border bg-background p-4"
+        >
           <ProductImage product={product} />
           <div className="min-w-0 flex-1">
-            <p className="mb-1 text-xs font-semibold uppercase text-muted-foreground">{product.shop}</p>
-            <a href={product.sourceUrl} target="_blank" rel="noopener noreferrer" className="block break-words text-sm font-bold leading-snug hover:text-primary">{product.name}</a>
-            <p className="mt-2 break-words text-xs leading-relaxed text-muted-foreground">{product.description}</p>
+            <p className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
+              {product.shop}
+            </p>
+            <a
+              href={product.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block break-words text-sm font-bold leading-snug hover:text-primary"
+            >
+              {product.name}
+            </a>
+            <p className="mt-2 break-words text-xs leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-base font-bold">{product.price}</span>
               <Button asChild size="sm">
-                <a href={product.orderUrl ?? product.sourceUrl} target="_blank" rel="noopener noreferrer" title={product.orderUrl ? `Order from ${product.shop}` : `Open ${product.shop} to choose options and add to cart`}>
+                <a
+                  href={product.orderUrl ?? product.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={
+                    product.orderUrl
+                      ? `Order from ${product.shop}`
+                      : `Open ${product.shop} to choose options and add to cart`
+                  }
+                >
                   <ShoppingBag /> Order <ArrowUpRight />
                 </a>
               </Button>

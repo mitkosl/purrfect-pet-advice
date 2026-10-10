@@ -40,7 +40,9 @@ export const Route = createFileRoute("/api/chat")({
 
         let mcp: Awaited<ReturnType<typeof createMCPClient>> | undefined;
         try {
-          mcp = await createMCPClient({ transport: { type: "http", url: MCP_URL, redirect: "error" } });
+          mcp = await createMCPClient({
+            transport: { type: "http", url: MCP_URL, redirect: "error" },
+          });
         } catch (e) {
           console.error("MCP connect failed", e);
         }
@@ -48,15 +50,32 @@ export const Route = createFileRoute("/api/chat")({
         const tools = {
           ...mcpTools,
           show_products: tool({
-            description: "Display recommended shop products as visual cards, after searching the directory. Use only real product information returned by the shop tools. This is a display-only tool; it never adds items to a cart.",
+            description:
+              "Display recommended shop products as visual cards, after searching the directory. Use only real product information returned by the shop tools. This is a display-only tool; it never adds items to a cart.",
             inputSchema: z.object({
-              products: z.array(z.object({
-                name: z.string(), shop: z.string(), price: z.string(),
-                description: z.string().describe("Short product information and age/weight suitability in the user's language."),
-                sourceUrl: z.string().describe("Exact product source_url from the shop result."),
-                imageUrl: z.string().nullable().describe("Exact product image URL from shop results, or null."),
-                orderUrl: z.string().nullable().describe("Exact product-specific cart or order URL returned by shop tools, or null. Never invent."),
-              })),
+              products: z.array(
+                z.object({
+                  name: z.string(),
+                  shop: z.string(),
+                  price: z.string(),
+                  description: z
+                    .string()
+                    .describe(
+                      "Short product information and age/weight suitability in the user's language.",
+                    ),
+                  sourceUrl: z.string().describe("Exact product source_url from the shop result."),
+                  imageUrl: z
+                    .string()
+                    .nullable()
+                    .describe("Exact product image URL from shop results, or null."),
+                  orderUrl: z
+                    .string()
+                    .nullable()
+                    .describe(
+                      "Exact product-specific cart or order URL returned by shop tools, or null. Never invent.",
+                    ),
+                }),
+              ),
             }),
             execute: (input) => ({ products: normalizeRecommendations(input) }),
           }),
@@ -76,7 +95,7 @@ export const Route = createFileRoute("/api/chat")({
           instructions: INSTRUCTIONS,
           messages: await convertToModelMessages(body.messages),
           tools,
-           stopWhen: isStepCount(50),
+          stopWhen: isStepCount(50),
           abortSignal: request.signal,
           providerOptions: {
             openai: {
@@ -96,7 +115,12 @@ export const Route = createFileRoute("/api/chat")({
         });
 
         return withLovableAiGatewayRunIdHeader(
-          result.toUIMessageStreamResponse({ originalMessages: body.messages, sendReasoning: true, onError: (error) => error instanceof Error ? error.message : "Pal couldn't finish this reply." }),
+          result.toUIMessageStreamResponse({
+            originalMessages: body.messages,
+            sendReasoning: true,
+            onError: (error) =>
+              error instanceof Error ? error.message : "Pal couldn't finish this reply.",
+          }),
           runIdFetch,
         );
       },

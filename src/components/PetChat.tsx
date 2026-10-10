@@ -4,9 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
-import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from "@/components/ai-elements/conversation";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+} from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import { PromptInput, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from "@/components/ai-elements/prompt-input";
+import {
+  PromptInput,
+  PromptInputFooter,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
@@ -18,7 +28,13 @@ const SUGGESTIONS = [
   "What flea protection is safe for a puppy?",
 ];
 
-export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; onProductsChange?: (hasProducts: boolean) => void }) {
+export function PetChat({
+  onClose,
+  onProductsChange,
+}: {
+  onClose?: () => void;
+  onProductsChange?: (hasProducts: boolean) => void;
+}) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { messages, sendMessage, status, stop } = useChat({
@@ -28,13 +44,17 @@ export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; o
     },
   });
   const busy = status === "submitted" || status === "streaming";
-  const hasProducts = messages.some((message) => message.parts.some((part) => {
-    if (!isToolUIPart(part) || part.state !== "output-available") return false;
-    const name = part.type === "dynamic-tool" ? part.toolName : part.type.slice(5);
-    return name === "show_products" && normalizeRecommendations(part.output).length > 0;
-  }));
+  const hasProducts = messages.some((message) =>
+    message.parts.some((part) => {
+      if (!isToolUIPart(part) || part.state !== "output-available") return false;
+      const name = part.type === "dynamic-tool" ? part.toolName : part.type.slice(5);
+      return name === "show_products" && normalizeRecommendations(part.output).length > 0;
+    }),
+  );
 
-  useEffect(() => { onProductsChange?.(hasProducts); }, [hasProducts, onProductsChange]);
+  useEffect(() => {
+    onProductsChange?.(hasProducts);
+  }, [hasProducts, onProductsChange]);
   useEffect(() => {
     if (!busy) textareaRef.current?.focus();
   }, [busy]);
@@ -55,7 +75,13 @@ export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; o
           <p className="text-xs text-muted-foreground">Pet care & finds from pet shops</p>
         </div>
         {onClose && (
-          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close chat" className="shrink-0 text-muted-foreground">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClose}
+            aria-label="Close chat"
+            className="shrink-0 text-muted-foreground"
+          >
             <X className="size-4" />
           </Button>
         )}
@@ -68,13 +94,15 @@ export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; o
               <div className="mt-4 flex flex-col gap-2">
                 <img src={logo} alt="" width={64} height={64} className="mx-auto size-16" />
                 <p className="font-display text-xl">Hi, I'm Pal!</p>
-                <p className="text-sm text-muted-foreground">Tell me about your pet — I'll share care tips and find products.</p>
+                <p className="text-sm text-muted-foreground">
+                  Tell me about your pet — I'll share care tips and find products.
+                </p>
                 {SUGGESTIONS.map((s) => (
                   <Button
                     key={s}
-                     variant="outline"
+                    variant="outline"
                     onClick={() => send(s)}
-                     className="h-auto whitespace-normal rounded-lg p-3 text-left text-sm"
+                    className="h-auto whitespace-normal rounded-lg p-3 text-left text-sm"
                   >
                     {s}
                   </Button>
@@ -83,16 +111,30 @@ export function PetChat({ onClose, onProductsChange }: { onClose?: () => void; o
             </ConversationEmptyState>
           ) : (
             messages.map((m) => (
-              <Message key={m.id} from={m.role} className={m.role === "assistant" ? "max-w-full" : undefined}>
+              <Message
+                key={m.id}
+                from={m.role}
+                className={m.role === "assistant" ? "max-w-full" : undefined}
+              >
                 <MessageContent className={m.role === "assistant" ? "w-full" : undefined}>
                   {m.parts.map((p, i) => {
                     if (p.type === "text")
-                      return <MessageResponse key={i} linkSafety={{ enabled: false }} isAnimating={status === "streaming" && m.id === messages.at(-1)?.id}>{p.text}</MessageResponse>;
+                      return (
+                        <MessageResponse
+                          key={i}
+                          linkSafety={{ enabled: false }}
+                          isAnimating={status === "streaming" && m.id === messages.at(-1)?.id}
+                        >
+                          {p.text}
+                        </MessageResponse>
+                      );
                     if (isToolUIPart(p)) {
                       const name = p.type === "dynamic-tool" ? p.toolName : p.type.slice(5);
                       if (name !== "show_products" || p.state !== "output-available") return null;
                       const products = normalizeRecommendations(p.output);
-                      return products.length ? <ProductRecommendations key={i} products={products} /> : null;
+                      return products.length ? (
+                        <ProductRecommendations key={i} products={products} />
+                      ) : null;
                     }
                     return null;
                   })}
