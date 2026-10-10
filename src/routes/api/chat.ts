@@ -44,9 +44,9 @@ export const Route = createFileRoute("/api/chat")({
             transport: { type: "http", url: MCP_URL, redirect: "error" },
           });
         } catch (e) {
-          console.error("MCP connect failed", e);
+          console.error("MCP connect failed", e); (globalThis as any).__mcpErr = String(e?.stack ?? e);
         }
-        const mcpTools = mcp ? await mcp.tools().catch((e) => { console.error("MCP tools failed", e); return {}; }) : {};
+        const mcpTools = mcp ? await mcp.tools().catch((e) => { console.error("MCP tools failed", e); (globalThis as any).__mcpErr = String(e?.stack ?? e); return {}; }) : {};
         const tools = {
           ...mcpTools,
           show_products: tool({
@@ -114,6 +114,7 @@ export const Route = createFileRoute("/api/chat")({
           onAbort: close,
         });
 
+        if (new URL(request.url).searchParams.has("debug")) return new Response(String((globalThis as any).__mcpErr ?? "ok " + Object.keys(mcpTools).join(",")));
         return withLovableAiGatewayRunIdHeader(
           result.toUIMessageStreamResponse({
             originalMessages: body.messages,
