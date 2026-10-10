@@ -7,6 +7,14 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    resolve: {
+      // pkce-challenge has no "workerd"/"worker" export; its browser build uses Web Crypto and runs on Workers.
+      alias: {
+        "pkce-challenge": "/dev-server/node_modules/pkce-challenge/dist/index.browser.js",
+      },
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
