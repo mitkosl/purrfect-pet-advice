@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone } from "lucide-react";
+import { Stethoscope, Syringe, Scissors, HeartPulse, MapPin, Phone, MessageCircle, X } from "lucide-react";
+import { useState } from "react";
 
 import hero from "@/assets/hero.jpg";
 import kitten from "@/assets/kitten.jpg";
@@ -29,9 +30,11 @@ const services = [
 ];
 
 function Index() {
+  const [chatOpen, setChatOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
-      <main className="flex-1 lg:h-screen lg:overflow-y-auto">
+    <div className="min-h-screen">
+      <main>
         <header className="flex items-center justify-between px-6 py-5 md:px-12">
           <div className="flex items-center gap-2">
             <img src={logo} alt="" width={36} height={36} className="size-9" />
@@ -95,9 +98,19 @@ function Index() {
         </footer>
       </main>
 
-      <aside className="h-[80vh] border-t lg:sticky lg:top-0 lg:h-screen lg:w-[420px] lg:border-l lg:border-t-0">
-        <PetChat />
-      </aside>
+      {chatOpen && (
+        <div className="fixed bottom-24 right-4 z-50 flex h-[min(600px,calc(100dvh-8rem))] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-2xl md:right-6">
+          <PetChat onClose={() => setChatOpen(false)} />
+        </div>
+      )}
+
+      <button
+        onClick={() => setChatOpen((o) => !o)}
+        aria-label={chatOpen ? "Close chat" : "Chat with Pal"}
+        className="fixed bottom-6 right-4 z-50 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:right-6"
+      >
+        {chatOpen ? <X className="size-6" /> : <MessageCircle className="size-6" />}
+      </button>
     </div>
   );
 }

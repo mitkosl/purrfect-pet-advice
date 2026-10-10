@@ -22,7 +22,7 @@ const toolTitles: Record<string, string> = {
   get_categories: "Browsing categories",
 };
 
-export function PetChat() {
+export function PetChat({ onClose }: { onClose?: () => void }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
