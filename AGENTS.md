@@ -10,3 +10,5 @@
 <!-- LOVABLE:END -->
 
 - Chat assistant streams from src/routes/api/chat.ts and loads tools from the storefront MCP server per request; why: keeps API key and MCP access server-side.
+- Product recommendations use a display-only show_products tool and a shared validated card model; why: separates readable product cards from hidden MCP activity and prevents invented cart destinations.
+- Background tool and reasoning parts remain in the conversation transport but are not rendered; why: preserves follow-up context while showing only advice, recommendations, and a thinking indicator.
