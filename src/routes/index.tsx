@@ -17,8 +17,12 @@ import logo from "@/assets/pal-logo.png";
 import { PetChat } from "@/components/PetChat";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { isChatDebugEnabled } from "@/lib/chat-presentation";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    debug: isChatDebugEnabled(search["debug"]),
+  }),
   head: () => ({
     meta: [
       { title: "Pawsome Vet Clinic — Care for every paw" },
@@ -47,6 +51,7 @@ const services = [
 ];
 
 function Index() {
+  const { debug } = Route.useSearch();
   const [chatOpen, setChatOpen] = useState(false);
   const [hasProducts, setHasProducts] = useState(false);
 
@@ -163,6 +168,7 @@ function Index() {
           )}
         >
           <PetChat
+            debug={debug}
             onClose={() => {
               setChatOpen(false);
               setHasProducts(false);

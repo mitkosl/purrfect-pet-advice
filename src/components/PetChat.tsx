@@ -22,6 +22,7 @@ import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/componen
 import { Button } from "@/components/ui/button";
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { normalizeRecommendations } from "@/lib/product-recommendations";
+import { orderedChatParts } from "@/lib/chat-presentation";
 import logo from "@/assets/pal-logo.png";
 
 const SUGGESTIONS = [
@@ -30,9 +31,11 @@ const SUGGESTIONS = [
 ];
 
 export function PetChat({
+  debug = false,
   onClose,
   onProductsChange,
 }: {
+  debug?: boolean;
   onClose?: () => void;
   onProductsChange?: (hasProducts: boolean) => void;
 }) {
@@ -118,7 +121,7 @@ export function PetChat({
                 className={m.role === "assistant" ? "max-w-full" : undefined}
               >
                 <MessageContent className={m.role === "assistant" ? "w-full" : undefined}>
-                  {m.parts.map((p, i) => {
+                  {orderedChatParts(m.parts, debug, busy && m.id === messages.at(-1)?.id).map((p, i) => {
                     if (p.type === "text")
                       return (
                         <MessageResponse
@@ -135,10 +138,13 @@ export function PetChat({
                         if (p.state !== "output-available") return null;
                         const products = normalizeRecommendations(p.output);
                         return products.length ? (
-                          <ProductRecommendations key={i} products={products} />
+                          <div key={i} className="flex w-full flex-col gap-3">
+                            <p className="text-sm font-semibold">We recommend these for your pet:</p>
+                            <ProductRecommendations products={products} />
+                          </div>
                         ) : null;
                       }
-                      // Debug: show shop searches and their raw results.
+                      // Search details are available only in URL-enabled debug mode.
                       return (
                         <Tool key={i} defaultOpen={false}>
                           {p.type === "dynamic-tool" ? (
