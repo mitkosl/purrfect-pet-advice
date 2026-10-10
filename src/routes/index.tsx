@@ -168,7 +168,7 @@ function Index() {
           )}
         >
           <PetChat
-            debug={debug}
+            debug={debug ?? false}
             onClose={() => {
               setChatOpen(false);
               setHasProducts(false);
