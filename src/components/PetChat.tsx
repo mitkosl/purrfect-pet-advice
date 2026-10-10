@@ -2,6 +2,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isToolUIPart, type DynamicToolUIPart, type ToolUIPart } from "ai";
 import { useState } from "react";
 import { toast } from "sonner";
+import { X } from "lucide-react";
 
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
@@ -45,10 +46,15 @@ export function PetChat({ onClose }: { onClose?: () => void }) {
     <div className="flex h-full flex-col bg-card">
       <div className="flex items-center gap-3 border-b px-5 py-4">
         <img src={logo} alt="Pal" width={40} height={40} className="size-10" />
-        <div>
+        <div className="flex-1">
           <p className="font-display text-lg leading-tight">Ask Pal</p>
           <p className="text-xs text-muted-foreground">Pet care advice & products from Zoomag</p>
         </div>
+        {onClose && (
+          <button onClick={onClose} aria-label="Close chat" className="rounded-full p-1.5 text-muted-foreground hover:bg-accent">
+            <X className="size-4" />
+          </button>
+        )}
       </div>
 
       <Conversation className="flex-1">
