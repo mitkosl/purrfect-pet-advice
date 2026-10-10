@@ -14,6 +14,16 @@ import {
 const MCP_URL = "https://storefront.fleetq.net/mcp/";
 const MODEL = "openai/gpt-6-luna"; // cheapest current model with tool calling
 
+// Cloudflare Workers reject fetch called as a method ("Illegal invocation") and
+// don't support redirect: "error", so call fetch unbound with "manual" and block redirects ourselves.
+const workerSafeFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const res = await fetch(input, { ...init, redirect: "manual" });
+  if (res.status >= 300 && res.status < 400) {
+    throw new Error(`Shop server redirected (HTTP ${res.status}); redirects are blocked`);
+  }
+  return res;
+};
+
 const INSTRUCTIONS = `You are "Pal", the friendly sales assistant of Pawsome Vet Clinic.
 Your main job is to SELL: on EVERY message (even greetings or general questions) find and recommend relevant shop products. Always suggest useful add-ons (food, treats, toys, flea protection, grooming, litter, beds, carriers).
 Be BRIEF: after the product cards, write at most 2-3 short sentences (one tip + a nudge to order). No long explanations, no lists of caveats, never ask clarifying questions instead of recommending.
@@ -42,20 +52,35 @@ export const Route = createFileRoute("/api/chat")({
         if (!Array.isArray(body.messages)) return new Response("Invalid request", { status: 400 });
 
         let mcp: Awaited<ReturnType<typeof createMCPClient>> | undefined;
+        let mcpError = "";
         try {
           mcp = await createMCPClient({
-            // Bound wrapper: the MCP transport calls fetch as a method, which Cloudflare Workers reject ("Illegal invocation").
-            transport: { type: "http", url: MCP_URL, redirect: "error", fetch: (input, init) => fetch(input, init) },
+            transport: { type: "http", url: MCP_URL, redirect: "error", fetch: workerSafeFetch },
           });
         } catch (e) {
           console.error("MCP connect failed", e);
+          mcpError = e instanceof Error ? e.message : String(e);
         }
-        const allMcpTools = mcp ? await mcp.tools().catch((e) => { console.error("MCP tools failed", e); return {}; }) : {};
+        const allMcpTools = mcp
+          ? await mcp.tools().catch((e) => {
+              console.error("MCP tools failed", e);
+              mcpError = e instanceof Error ? e.message : String(e);
+              return {};
+            })
+          : {};
         // Only read-only shop tools; ordering/booking mutations are never exposed to the model.
         const READ_TOOLS = ["find_business", "search_products", "get_product", "get_categories", "get_info"];
         const mcpTools = Object.fromEntries(
           Object.entries(allMcpTools).filter(([name]) => READ_TOOLS.includes(name)),
         );
+        if (!("search_products" in mcpTools)) {
+          // Surface the real failure instead of letting the AI answer without the shop.
+          mcp?.close().catch(() => {});
+          return new Response(
+            `Couldn't connect to the shop (${MCP_URL}): ${mcpError || "search_products tool not available"}`,
+            { status: 502 },
+          );
+        }
         const tools = {
           ...mcpTools,
           show_products: tool({

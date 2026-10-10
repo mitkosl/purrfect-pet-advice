@@ -11,5 +11,5 @@
 
 - Chat assistant streams from src/routes/api/chat.ts and loads tools from the storefront MCP server per request; why: keeps API key and MCP access server-side.
 - Product recommendations use a display-only show_products tool and a shared validated card model; why: separates readable product cards from hidden MCP activity and prevents invented cart destinations.
-- Background tool and reasoning parts remain in the conversation transport but are not rendered; why: preserves follow-up context while showing only advice, recommendations, and a thinking indicator.
-- The MCP transport gets an explicit bound fetch wrapper; why: Cloudflare Workers throw "Illegal invocation" when fetch is called as a method of another object.
+- Shop search tool parts render as collapsed debug cards; reasoning parts stay hidden; why: user asked to see searches while debugging the MCP integration.
+- The MCP transport uses a worker-safe fetch wrapper (unbound call, redirect "manual" + blocked 3xx); why: Cloudflare Workers throw "Illegal invocation" for method-called fetch and reject redirect "error".
