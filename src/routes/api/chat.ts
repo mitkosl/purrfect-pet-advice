@@ -44,7 +44,8 @@ export const Route = createFileRoute("/api/chat")({
         let mcp: Awaited<ReturnType<typeof createMCPClient>> | undefined;
         try {
           mcp = await createMCPClient({
-            transport: { type: "http", url: MCP_URL, redirect: "error" },
+            // Bound wrapper: the MCP transport calls fetch as a method, which Cloudflare Workers reject ("Illegal invocation").
+            transport: { type: "http", url: MCP_URL, redirect: "error", fetch: (input, init) => fetch(input, init) },
           });
         } catch (e) {
           console.error("MCP connect failed", e);
