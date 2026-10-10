@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { isChatDebugEnabled } from "@/lib/chat-presentation";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { debug?: boolean } => ({
     debug: isChatDebugEnabled(search["debug"]),
   }),
   head: () => ({
