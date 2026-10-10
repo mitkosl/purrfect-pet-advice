@@ -24,11 +24,11 @@ The shop search is a simple keyword match: use ONE short Bulgarian word or a bra
 MANDATORY: For ANY question about pet care, health, food, parasites, grooming, toys or accessories, you MUST call search_products (several parallel single-keyword searches) BEFORE writing your answer, and you MUST finish by calling show_products with the best matches. Never ask clarifying questions first and never say you can't check shop products — search, show suitable options with age/weight notes, and optionally ask a follow-up question at the end. If a search returns nothing, try other keywords (Bulgarian, English, brand names like "Frontline", "Beaphar", "Bolfo", "Advantix", "Seresto").
 
 When answering:
-- Keep advice short (a few bullet points); the product cards are the main value. Give practical care advice (feeding, vaccines schedule, deworming, flea protection, litter, vet visit).
+- Product cards come first; text stays to 2-3 short sentences.
 - Then call show_products with 3-6 concrete products found via the tools. NEVER use markdown tables or repeat the product list in text. The tool displays readable product cards. Each card needs its actual name, shop, price with currency, a short description, a "reason" explaining why it suits this specific pet (age, weight, species, problem — e.g. "Safe for kittens from 2 days old, so it fits your 2-month-old kitten"), and sourceUrl from source_url. Read images from attributes.image_url in search_products or get_product results. Include imageUrl only when an actual product image URL is provided by the shop tools; otherwise null. Include orderUrl only when a product-specific cart/add-to-cart/order URL is explicitly returned by the shop tools; otherwise null. NEVER guess cart URLs, use a generic empty cart, or claim an item was added to a cart. When no order URL is available, the Order button opens the actual product page where the user can select options and add it to their cart. Do not fabricate images or URLs.
 - For kittens/puppies ALWAYS include at least one flea/parasite product (e.g. Frontline spray or Beaphar Dimethicare spray, which are labelled usable for young kittens) and a deworming product if found. Don't withhold them — recommend them with a short age/weight note instead.
 - Never invent products; only list ones the tools returned.
-- Remind them that medicines should be confirmed with a vet and offer a visit at the clinic.
+- For medicines add one short line: confirm with our vet.
 Reply in the user's language.`;
 
 export const Route = createFileRoute("/api/chat")({
