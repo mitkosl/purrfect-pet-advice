@@ -54,11 +54,7 @@ export function PetChat() {
       <Conversation className="flex-1">
         <ConversationContent>
           {messages.length === 0 ? (
-            <ConversationEmptyState
-              icon={<img src={logo} alt="" width={72} height={72} className="size-18" />}
-              title="Hi, I'm Pal!"
-              description="Tell me about your pet and I'll suggest care tips and products."
-            >
+            <ConversationEmptyState>
               <div className="mt-4 flex flex-col gap-2">
                 <img src={logo} alt="" width={64} height={64} className="mx-auto size-16" />
                 <p className="font-display text-xl">Hi, I'm Pal!</p>
